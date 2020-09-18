@@ -20,6 +20,7 @@ module Steep
     attr_reader :should_update
     attr_reader :contexts
     attr_reader :root_context
+    attr_reader :declaration_index
 
     def initialize(source:, root_context:, parent: nil, parent_last_update: parent&.last_update, contexts: nil)
       @source = source
@@ -33,6 +34,12 @@ module Steep
       @typing = {}.compare_by_identity
       @root_context = root_context
       @contexts = contexts || TypeInference::ContextArray.from_source(source: source)
+
+      @declaration_index = if parent
+                             parent.declaration_index.new_child()
+                           else
+                             DeclarationIndex.new(source: source)
+                           end
     end
 
     def add_error(error)
